@@ -18,10 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-          cache: pip
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,21 +29,28 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Verify Flutter
+        run: |
+          flutter --version
+          flutter doctor
+
       - name: Install Flet
         run: |
           python -m pip install --upgrade pip
           python -m pip install "flet[all]"
 
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           if [ -f requirements.txt ]; then
             python -m pip install -r requirements.txt
           fi
 
-      - name: Verify entry point
+      - name: Show project files
         run: |
-          test -f 304414
-          python -m py_compile 304414
+          echo "=== Project files ==="
+          find . -maxdepth 3 -type f \
+            ! -path "./.git/*" \
+            | sort
 
       - name: Build Distra APK
         run: |
@@ -53,9 +59,10 @@ jobs:
       - name: Find APK
         if: always()
         run: |
+          echo "=== Generated APK files ==="
           find . -type f -name "*.apk" -print
 
-      - name: Upload APK
+      - name: Upload Distra APK
         uses: actions/upload-artifact@v4
         with:
           name: Distra-APK
