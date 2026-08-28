@@ -7,7 +7,9 @@ authors = [
     { name = "KkooKk Ahm", email = "ahmkkookk@gmail.com" }
 ]
 dependencies = [
-    "flet"
+    "flet",
+    "fastapi",
+    "uvicorn"
 ]
 
 [dependency-groups]
