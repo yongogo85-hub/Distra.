@@ -44,16 +44,48 @@ jobs:
             python -m pip install -r requirements.txt
           fi
 
+      - name: Detect Python entry point
+        shell: bash
+        run: |
+          echo "Python files in project:"
+          find . -maxdepth 2 -type f -name "*.py" -print
+
+          if [ -f "main.py" ]; then
+            echo "main.py already exists."
+            exit 0
+          fi
+
+          if [ -f "304414" ]; then
+            echo "Renaming 304414 to main.py for the build."
+            cp "304414" "main.py"
+            exit 0
+          fi
+
+          if [ -f "304414.py" ]; then
+            echo "304414.py found."
+            cp "304414.py" "main.py"
+            exit 0
+          fi
+
+          echo "ERROR: Could not find the Distra Python entry point."
+          exit 1
+
+      - name: Verify Python entry point
+        run: |
+          test -f main.py
+          python -m py_compile main.py
+
       - name: Build Distra APK
         run: |
-          flet build apk --module-name 304414 --verbose
+          flet build apk --verbose
 
       - name: Find APK
         if: always()
         run: |
+          echo "Generated APK files:"
           find . -type f -name "*.apk" -print
 
-      - name: Upload APK
+      - name: Upload Distra APK
         uses: actions/upload-artifact@v4
         with:
           name: Distra-APK
